@@ -3,7 +3,11 @@ package com.map;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import com.google.android.gms.maps.GoogleMap;
+
 public class MainActivity extends AppCompatActivity {
+
+    GoogleMap mMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
