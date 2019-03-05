@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
                     GooglePlayServicesUtil.getErrorDialog(isAvailable, this, ERROR_DIALOG_REQUEST);
             dialog.show();
         } else {
-            Toast.makeText(this, "Can't connect to maping service ", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Can't connect to mapping service ", Toast.LENGTH_SHORT).show();
         }
         return false;
     }
