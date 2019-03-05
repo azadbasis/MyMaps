@@ -8,8 +8,10 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     GoogleMap mMap;
     private static final int ERROR_DIALOG_REQUEST = 9001;
@@ -20,10 +22,17 @@ public class MainActivity extends AppCompatActivity {
 
         if (servicesOK()) {
             setContentView(R.layout.activity_map);
-            Toast.makeText(this, "Ready to Map", Toast.LENGTH_SHORT).show();
+            initMap();
+            Toast.makeText(this, "Ready to Map!", Toast.LENGTH_SHORT).show();
+
         } else {
             setContentView(R.layout.activity_main);
         }
+    }
+
+    private void initMap() {
+        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+        mapFragment.getMapAsync(this);
     }
 
     public boolean servicesOK() {
@@ -39,4 +48,19 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
+
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+
+        if (mMap == null) {
+            mMap = googleMap;
+            Toast.makeText(this, "Map connected!", Toast.LENGTH_SHORT).show();
+        }else {
+            Toast.makeText(this, "Map not connected! ", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+
 }
