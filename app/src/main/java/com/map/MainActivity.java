@@ -17,9 +17,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
         if (servicesOK()) {
+            setContentView(R.layout.activity_map);
             Toast.makeText(this, "Ready to Map", Toast.LENGTH_SHORT).show();
+        } else {
+            setContentView(R.layout.activity_main);
         }
     }
 
