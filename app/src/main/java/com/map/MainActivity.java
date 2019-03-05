@@ -1,8 +1,13 @@
 package com.map;
 
 import android.app.Dialog;
+import android.location.Address;
+import android.location.Geocoder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -13,6 +18,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+
+import java.io.IOException;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -65,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (mMap == null) {
             mMap = googleMap;
-            gotoLocation(SEATTLE_LATE,SEATTLE_LNG,15);
+            gotoLocation(SEATTLE_LATE, SEATTLE_LNG, 15);
             Toast.makeText(this, "Map connected!", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Map not connected! ", Toast.LENGTH_SHORT).show();
@@ -73,11 +81,39 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
     }
 
-    private void gotoLocation(double lat,double lng,float zoom){
+    private void gotoLocation(double lat, double lng, float zoom) {
 
-        LatLng latLng = new LatLng(lat,lng);
-        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latLng,zoom);
+        LatLng latLng = new LatLng(lat, lng);
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latLng, zoom);
         mMap.moveCamera(update);
     }
 
+    public void geoLocate(View view) throws IOException {
+
+        hideSoftKeyboard(view);
+        TextView tv = (TextView)findViewById(R.id.editText1);
+        String searchString = tv.getText().toString();
+//        Toast.makeText(this, "Searching for: "+searchString, Toast.LENGTH_SHORT).show();
+        Geocoder gc = new Geocoder(this);
+        List<Address> list=gc.getFromLocationName(searchString,1);
+        if(list.size()>0){
+            Address add=list.get(0);
+            String locality=add.getLocality();
+            Toast.makeText(this, "Found: "+locality, Toast.LENGTH_SHORT).show();
+
+            double lat=add.getLatitude();
+            double lng=add.getLongitude();
+            gotoLocation(lat,lng,15);
+
+        }
+
+
+    }
+
+    private void hideSoftKeyboard(View view) {
+
+        InputMethodManager imm =
+                (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(view.getWindowToken(),0);
+    }
 }
