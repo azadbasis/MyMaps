@@ -7,14 +7,24 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
 
 public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
 
-    GoogleMap mMap;
     private static final int ERROR_DIALOG_REQUEST = 9001;
+    GoogleMap mMap;
+    private static final double
+            SEATTLE_LATE = 47.60621,
+            SEATTLE_LNG = -122.33207,
+            SYDNEY_LAT = -33.867487,
+            SYDNEY_LNG = 151.20699,
+            NEWYORK_LAT = 40.714353,
+            NEWYORK_LNG = -74.005973;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,12 +65,19 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
 
         if (mMap == null) {
             mMap = googleMap;
+            gotoLocation(SEATTLE_LATE,SEATTLE_LNG,15);
             Toast.makeText(this, "Map connected!", Toast.LENGTH_SHORT).show();
-        }else {
+        } else {
             Toast.makeText(this, "Map not connected! ", Toast.LENGTH_SHORT).show();
         }
 
     }
 
+    private void gotoLocation(double lat,double lng,float zoom){
+
+        LatLng latLng = new LatLng(lat,lng);
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latLng,zoom);
+        mMap.moveCamera(update);
+    }
 
 }
