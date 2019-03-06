@@ -31,6 +31,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -144,7 +145,10 @@ public class MainActivity extends AppCompatActivity
             }
             MarkerOptions options = new MarkerOptions()
                     .title(locality)
-                    .position(new LatLng(lat, lng));
+                    .position(new LatLng(lat, lng))
+                  //  .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
+                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_marker));
+
             marker = mMap.addMarker(options);
 
         }
