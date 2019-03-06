@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Landon Hotels</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="error_finding_hotel">Error finding hotel location on the map</string>
+    <string name="landon_hotel">Landon Hotel</string>
+    <string name="error_connect_to_services">Can\'t connect to Google Play services</string>
+    <string name="error_find_hotel">"Can't find hotel"</string>
+</resources>
