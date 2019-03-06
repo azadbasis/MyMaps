@@ -32,6 +32,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -56,7 +57,6 @@ public class MainActivity extends AppCompatActivity
             NEWYORK_LNG = -74.005973;
 
     private GoogleApiClient mLocationClient;
-    private LocationListener mListener;
 
 
     @Override
@@ -135,6 +135,10 @@ public class MainActivity extends AppCompatActivity
             double lat = add.getLatitude();
             double lng = add.getLongitude();
             gotoLocation(lat, lng, 15);
+            MarkerOptions options = new MarkerOptions()
+                    .title(locality)
+                    .position(new LatLng(lat,lng));
+            mMap.addMarker(options);
 
         }
 
@@ -210,23 +214,7 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Toast.makeText(this, "Ready to Map!", Toast.LENGTH_SHORT).show();
-        mListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                Toast.makeText(MainActivity.this, "Location changed: "+location.getLatitude()+", "
-                        +location.getLongitude(), Toast.LENGTH_SHORT).show();
-                gotoLocation(location.getLatitude(),location.getLongitude(),15);
-            }
-        };
 
-        LocationRequest request = LocationRequest.create();
-        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-        request.setInterval(5000);
-        request.setFastestInterval(1000);
-        if (checkLocationPermission())
-        LocationServices.FusedLocationApi.requestLocationUpdates(mLocationClient,request,mListener);
-        else
-            askPermission();
     }
 
     @Override
@@ -274,11 +262,6 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        LocationServices.FusedLocationApi.removeLocationUpdates(mLocationClient,mListener);
-    }
 
 
 }
