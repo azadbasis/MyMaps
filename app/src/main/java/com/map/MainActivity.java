@@ -5,6 +5,8 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
@@ -116,4 +118,41 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(view.getWindowToken(),0);
     }
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        //Add menu handling code
+        switch (id) {
+            case R.id.mapTypeNone:
+                mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
+                break;
+            case R.id.mapTypeNormal:
+                mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+                break;
+            case R.id.mapTypeSatellite:
+                mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                break;
+            case R.id.mapTypeTerrain:
+                mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
+                break;
+            case R.id.mapTypeHybrid:
+                mMap.setMapType(GoogleMap.MAP_TYPE_HYBRID);
+                break;
+        }
+
+
+        return super.onOptionsItemSelected(item);
+    }
+
 }
