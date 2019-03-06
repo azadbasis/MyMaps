@@ -5,7 +5,9 @@ import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Geocoder;
+import android.location.Location;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +22,8 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -31,10 +35,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity
+        implements OnMapReadyCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
 
     private static final int ERROR_DIALOG_REQUEST = 9001;
+    public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 10; // code you want.
     private static final String TAG = "MainActivity";
+
     GoogleMap mMap;
     private static final double
             SEATTLE_LATE = 47.60621,
@@ -43,11 +52,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             SYDNEY_LNG = 151.20699,
             NEWYORK_LAT = 40.714353,
             NEWYORK_LNG = -74.005973;
-    public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 10; // code you want.
 
-    String[] permissions = new String[]{
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.ACCESS_FINE_LOCATION};
+    private GoogleApiClient mLocationClient;
 
 
     @Override
@@ -57,7 +63,12 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
         if (servicesOK()) {
             setContentView(R.layout.activity_map);
             initMap();
-            Toast.makeText(this, "Ready to Map!", Toast.LENGTH_SHORT).show();
+            mLocationClient = new GoogleApiClient.Builder(this)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+            mLocationClient.connect();
 
         } else {
             setContentView(R.layout.activity_main);
@@ -91,10 +102,6 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
             mMap = googleMap;
             gotoLocation(SEATTLE_LATE, SEATTLE_LNG, 15);
 
-            if (checkLocationPermission())
-                mMap.setMyLocationEnabled(true);
-            else
-                askPermission();
             Toast.makeText(this, "Map connected!", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Map not connected! ", Toast.LENGTH_SHORT).show();
@@ -174,6 +181,45 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
     }
 
 
+    public void showCurrentLocation(MenuItem item) {
+        if (checkLocationPermission())
+            gotoCurrentLocation();
+        else
+            askPermission();
+    }
+
+    private void gotoCurrentLocation() {
+        if (checkLocationPermission()) {
+            Location currentLocation = LocationServices.FusedLocationApi.getLastLocation(mLocationClient);
+            if (currentLocation == null) {
+                Toast.makeText(this, "Couldn't connect!", Toast.LENGTH_SHORT).show();
+            } else {
+                LatLng latLng = new LatLng(
+                        currentLocation.getLatitude(),
+                        currentLocation.getLongitude()
+                );
+                CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latLng, 15);
+                mMap.animateCamera(update);
+            }
+        }
+    }
+
+    @Override
+    public void onConnected(@Nullable Bundle bundle) {
+        Toast.makeText(this, "Ready to Map!", Toast.LENGTH_SHORT).show();
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
     // Check for permission to access Location
     private boolean checkLocationPermission() {
         return (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -198,8 +244,8 @@ public class MainActivity extends AppCompatActivity implements OnMapReadyCallbac
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission granted
-                    if (checkLocationPermission())
-                        mMap.setMyLocationEnabled(true);
+                   gotoCurrentLocation();
+
                 } else {
                     // Permission denied
                     Log.d(TAG, "Fail to get permission PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION");

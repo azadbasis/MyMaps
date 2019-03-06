@@ -1,4 +1,5 @@
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/mapTypeNormal"
         android:title="@string/normal" />
@@ -14,5 +15,10 @@
     <item
         android:id="@+id/mapTypeNone"
         android:title="@string/none" />
+
+    <item android:id="@+id/currentLocation"
+        android:title="@string/current_location"
+        app:showAsAction="always"
+        android:onClick="showCurrentLocation"/>
 
 </menu>
