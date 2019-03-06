@@ -23,6 +23,8 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -44,7 +46,7 @@ public class MainActivity extends AppCompatActivity
     public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 10; // code you want.
     private static final String TAG = "MainActivity";
 
-    GoogleMap mMap;
+    private GoogleMap mMap;
     private static final double
             SEATTLE_LATE = 47.60621,
             SEATTLE_LNG = -122.33207,
@@ -54,6 +56,7 @@ public class MainActivity extends AppCompatActivity
             NEWYORK_LNG = -74.005973;
 
     private GoogleApiClient mLocationClient;
+    private LocationListener mListener;
 
 
     @Override
@@ -207,7 +210,23 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onConnected(@Nullable Bundle bundle) {
         Toast.makeText(this, "Ready to Map!", Toast.LENGTH_SHORT).show();
+        mListener = new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                Toast.makeText(MainActivity.this, "Location changed: "+location.getLatitude()+", "
+                        +location.getLongitude(), Toast.LENGTH_SHORT).show();
+                gotoLocation(location.getLatitude(),location.getLongitude(),15);
+            }
+        };
 
+        LocationRequest request = LocationRequest.create();
+        request.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        request.setInterval(5000);
+        request.setFastestInterval(1000);
+        if (checkLocationPermission())
+        LocationServices.FusedLocationApi.requestLocationUpdates(mLocationClient,request,mListener);
+        else
+            askPermission();
     }
 
     @Override
@@ -244,7 +263,7 @@ public class MainActivity extends AppCompatActivity
                 if (grantResults.length > 0
                         && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission granted
-                   gotoCurrentLocation();
+                    gotoCurrentLocation();
 
                 } else {
                     // Permission denied
@@ -254,4 +273,12 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        LocationServices.FusedLocationApi.removeLocationUpdates(mLocationClient,mListener);
+    }
+
+
 }
