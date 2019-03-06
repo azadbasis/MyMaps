@@ -2,13 +2,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.map">
-    <!--  Used by the API to download map tiles from Google Maps servers.-->
     <uses-permission android:name="android.permission.INTERNET" />
-    <!--Allows the API to check the connection status in order to determine whether data can be downloaded.-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!--If you're targeting earlier versions of the Google Play services SDK, you must request the-->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+
+
+    <!--user allow approximate Location base on wireless network and cellphone tower-->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!--user allow precise Location base on Global Position System(GPS) Location services-->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
 
     <application
         android:allowBackup="false"
