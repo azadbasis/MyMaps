@@ -32,6 +32,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity
             NEWYORK_LNG = -74.005973;
 
     private GoogleApiClient mLocationClient;
+    private Marker marker;
 
 
     @Override
@@ -124,9 +126,10 @@ public class MainActivity extends AppCompatActivity
         hideSoftKeyboard(view);
         TextView tv = (TextView) findViewById(R.id.editText1);
         String searchString = tv.getText().toString();
-//        Toast.makeText(this, "Searching for: "+searchString, Toast.LENGTH_SHORT).show();
+
         Geocoder gc = new Geocoder(this);
         List<Address> list = gc.getFromLocationName(searchString, 1);
+
         if (list.size() > 0) {
             Address add = list.get(0);
             String locality = add.getLocality();
@@ -135,10 +138,14 @@ public class MainActivity extends AppCompatActivity
             double lat = add.getLatitude();
             double lng = add.getLongitude();
             gotoLocation(lat, lng, 15);
+
+            if (marker != null) {
+                marker.remove();
+            }
             MarkerOptions options = new MarkerOptions()
                     .title(locality)
-                    .position(new LatLng(lat,lng));
-            mMap.addMarker(options);
+                    .position(new LatLng(lat, lng));
+            marker = mMap.addMarker(options);
 
         }
 
@@ -261,7 +268,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
     }
-
 
 
 }
