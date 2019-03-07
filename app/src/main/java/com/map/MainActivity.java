@@ -107,12 +107,45 @@ public class MainActivity extends AppCompatActivity
         if (mMap == null) {
             mMap = googleMap;
             gotoLocation(SEATTLE_LATE, SEATTLE_LNG, 15);
+            customWindow();
 
             Toast.makeText(this, "Map connected!", Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "Map not connected! ", Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    private void customWindow() {
+        if (mMap != null) {
+            mMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+                @Override
+                public View getInfoWindow(Marker marker) {
+                    return null;
+                }
+
+                @Override
+                public View getInfoContents(Marker marker) {
+
+
+                    View v = getLayoutInflater().inflate(R.layout.info_window, null);
+                    TextView tvLocality = (TextView) v.findViewById(R.id.tvLocality);
+                    TextView tvLat = (TextView) v.findViewById(R.id.tvLat);
+                    TextView tvLng = (TextView) v.findViewById(R.id.tvLng);
+                    TextView tvSnippet = (TextView) v.findViewById(R.id.tvSnippet);
+
+                    LatLng latLng = marker.getPosition();
+                    tvLocality.setText(marker.getTitle());
+                    tvLat.setText("Latitude: " +latLng.latitude);
+                    tvLng.setText("Longitude: " +latLng.longitude);
+                    tvSnippet.setText(marker.getSnippet());
+
+                    return v;
+
+
+            }
+            });
+        }
     }
 
     private void gotoLocation(double lat, double lng, float zoom) {
