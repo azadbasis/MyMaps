@@ -145,6 +145,31 @@ public class MainActivity extends AppCompatActivity
 
             }
             });
+            mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+                @Override
+                public void onMapLongClick(LatLng latLng) {
+                    Geocoder gc = new Geocoder(MainActivity.this);
+                    List<Address> list=null;
+                    try {
+                        list = gc.getFromLocation(latLng.latitude,latLng.longitude,1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                    Address add = list.get(0);
+                    MainActivity.this.addMarker(add,latLng.latitude,latLng.longitude);
+                }
+            });
+            mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    String msg=marker.getTitle()+" ("+
+                            marker.getPosition().latitude+", "+
+                            marker.getPosition().longitude+")";
+                    Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
         }
     }
 
