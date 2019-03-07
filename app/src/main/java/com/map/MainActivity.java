@@ -23,8 +23,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.LocationListener;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,9 +33,10 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -59,7 +58,8 @@ public class MainActivity extends AppCompatActivity
             NEWYORK_LNG = -74.005973;
 
     private GoogleApiClient mLocationClient;
-    private Marker marker;
+    private Marker marker1, marker2;
+    private Polyline line;
 
 
     @Override
@@ -106,7 +106,7 @@ public class MainActivity extends AppCompatActivity
 
         if (mMap == null) {
             mMap = googleMap;
-            gotoLocation(SEATTLE_LATE, SEATTLE_LNG, 15);
+            gotoLocation(SYDNEY_LAT, SYDNEY_LNG, 15);
             customWindow();
 
             Toast.makeText(this, "Map connected!", Toast.LENGTH_SHORT).show();
@@ -136,36 +136,36 @@ public class MainActivity extends AppCompatActivity
 
                     LatLng latLng = marker.getPosition();
                     tvLocality.setText(marker.getTitle());
-                    tvLat.setText("Latitude: " +latLng.latitude);
-                    tvLng.setText("Longitude: " +latLng.longitude);
+                    tvLat.setText("Latitude: " + latLng.latitude);
+                    tvLng.setText("Longitude: " + latLng.longitude);
                     tvSnippet.setText(marker.getSnippet());
 
                     return v;
 
 
-            }
+                }
             });
             mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
                 @Override
                 public void onMapLongClick(LatLng latLng) {
                     Geocoder gc = new Geocoder(MainActivity.this);
-                    List<Address> list=null;
+                    List<Address> list = null;
                     try {
-                        list = gc.getFromLocation(latLng.latitude,latLng.longitude,1);
+                        list = gc.getFromLocation(latLng.latitude, latLng.longitude, 1);
                     } catch (IOException e) {
                         e.printStackTrace();
                         return;
                     }
                     Address add = list.get(0);
-                    MainActivity.this.addMarker(add,latLng.latitude,latLng.longitude);
+                    MainActivity.this.addMarker(add, latLng.latitude, latLng.longitude);
                 }
             });
             mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
-                    String msg=marker.getTitle()+" ("+
-                            marker.getPosition().latitude+", "+
-                            marker.getPosition().longitude+")";
+                    String msg = marker.getTitle() + " (" +
+                            marker.getPosition().latitude + ", " +
+                            marker.getPosition().longitude + ")";
                     Toast.makeText(MainActivity.this, msg, Toast.LENGTH_SHORT).show();
                     return false;
                 }
@@ -185,10 +185,10 @@ public class MainActivity extends AppCompatActivity
                 @Override
                 public void onMarkerDragEnd(Marker marker) {
                     Geocoder gc = new Geocoder(MainActivity.this);
-                    List<Address> list=null;
+                    List<Address> list = null;
                     LatLng ll = marker.getPosition();
                     try {
-                        list = gc.getFromLocation(ll.latitude,ll.longitude,1);
+                        list = gc.getFromLocation(ll.latitude, ll.longitude, 1);
                     } catch (IOException e) {
                         e.printStackTrace();
                         return;
@@ -227,11 +227,10 @@ public class MainActivity extends AppCompatActivity
             double lng = add.getLongitude();
             gotoLocation(lat, lng, 15);
 
-            if (marker != null) {
-                marker.remove();
+            if (marker1 != null) {
+                marker1.remove();
             }
             addMarker(add, lat, lng);
-
 
         }
 
@@ -242,14 +241,43 @@ public class MainActivity extends AppCompatActivity
                 .title(add.getLocality())
                 .position(new LatLng(lat, lng))
                 .draggable(true)
-                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_marker));
-
+                .icon(BitmapDescriptorFactory.defaultMarker());
+//              .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_marker));
         String country = add.getCountryName();
         if (country.length() > 0) {
             options.snippet(country);
         }
 
-        marker = mMap.addMarker(options);
+        if (marker1 == null) {
+            marker1 = mMap.addMarker(options);
+        } else if (marker2 == null) {
+            marker2 = mMap.addMarker(options);
+            drawLine();
+        } else {
+            removeEverything();
+            marker1 = mMap.addMarker(options);
+        }
+
+    }
+
+    private void drawLine() {
+
+        PolylineOptions lineOptions = new PolylineOptions()
+                .add(marker1.getPosition())
+                .add(marker2.getPosition());
+        line = mMap.addPolyline(lineOptions);
+
+    }
+
+    private void removeEverything() {
+        marker1.remove();
+        marker1 = null;
+        marker2.remove();
+        marker2 = null;
+        if (line != null) {
+            line.remove();
+            line = null;
+        }
     }
 
     private void hideSoftKeyboard(View view) {
