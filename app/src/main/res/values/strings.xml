@@ -5,4 +5,6 @@
     <string name="landon_hotel">Landon Hotel</string>
     <string name="error_connect_to_services">Can\'t connect to Google Play services</string>
     <string name="error_find_hotel">"Can't find hotel"</string>
+    <string name="locality_dummy">Locality</string>
+    <string name="snippet_dummy">Snippet</string>
 </resources>
