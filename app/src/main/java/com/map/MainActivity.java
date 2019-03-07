@@ -3,6 +3,7 @@ package com.map;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -33,10 +34,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity
@@ -47,6 +51,7 @@ public class MainActivity extends AppCompatActivity
     private static final int ERROR_DIALOG_REQUEST = 9001;
     public static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 10; // code you want.
     private static final String TAG = "MainActivity";
+    private static final int POLYGON_POINTS = 3;
 
     private GoogleMap mMap;
     private static final double
@@ -58,9 +63,8 @@ public class MainActivity extends AppCompatActivity
             NEWYORK_LNG = -74.005973;
 
     private GoogleApiClient mLocationClient;
-    private Marker marker1, marker2;
-    private Polyline line;
-
+    List<Marker> markers = new ArrayList<>();
+    private Polygon shape;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -226,17 +230,30 @@ public class MainActivity extends AppCompatActivity
             double lat = add.getLatitude();
             double lng = add.getLongitude();
             gotoLocation(lat, lng, 15);
-
-            if (marker1 != null) {
-                marker1.remove();
-            }
             addMarker(add, lat, lng);
 
         }
 
     }
 
+    private void addPolygon() {
+        PolygonOptions options = new PolygonOptions()
+                .fillColor(0x330000FF)
+                .strokeWidth(3)
+                .strokeColor(Color.BLUE);
+        for (int i = 0; i < POLYGON_POINTS; i++) {
+            options.add(markers.get(i).getPosition());
+        }
+
+        shape = mMap.addPolygon(options);
+    }
+
     private void addMarker(Address add, double lat, double lng) {
+
+        if (markers.size() == POLYGON_POINTS) {
+            removeEverything();
+        }
+
         MarkerOptions options = new MarkerOptions()
                 .title(add.getLocality())
                 .position(new LatLng(lat, lng))
@@ -248,35 +265,21 @@ public class MainActivity extends AppCompatActivity
             options.snippet(country);
         }
 
-        if (marker1 == null) {
-            marker1 = mMap.addMarker(options);
-        } else if (marker2 == null) {
-            marker2 = mMap.addMarker(options);
-            drawLine();
-        } else {
-            removeEverything();
-            marker1 = mMap.addMarker(options);
+        markers.add(mMap.addMarker(options));
+        if (markers.size() == POLYGON_POINTS) {
+            addPolygon();
         }
 
     }
 
-    private void drawLine() {
-
-        PolylineOptions lineOptions = new PolylineOptions()
-                .add(marker1.getPosition())
-                .add(marker2.getPosition());
-        line = mMap.addPolyline(lineOptions);
-
-    }
-
     private void removeEverything() {
-        marker1.remove();
-        marker1 = null;
-        marker2.remove();
-        marker2 = null;
-        if (line != null) {
-            line.remove();
-            line = null;
+        for (Marker marker : markers) {
+            marker.remove();
+        }
+        markers.clear();
+        if (shape != null) {
+            shape.remove();
+            shape = null;
         }
     }
 
