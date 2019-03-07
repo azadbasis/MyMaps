@@ -31,6 +31,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -53,7 +55,6 @@ public class MainActivity extends AppCompatActivity
     private static final String TAG = "MainActivity";
     private static final int POLYGON_POINTS = 3;
 
-    private GoogleMap mMap;
     private static final double
             SEATTLE_LATE = 47.60621,
             SEATTLE_LNG = -122.33207,
@@ -62,9 +63,10 @@ public class MainActivity extends AppCompatActivity
             NEWYORK_LAT = 40.714353,
             NEWYORK_LNG = -74.005973;
 
+    private GoogleMap mMap;
     private GoogleApiClient mLocationClient;
-    List<Marker> markers = new ArrayList<>();
-    private Polygon shape;
+    private Marker marker;
+    private Circle shape;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -236,27 +238,15 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private void addPolygon() {
-        PolygonOptions options = new PolygonOptions()
-                .fillColor(0x330000FF)
-                .strokeWidth(3)
-                .strokeColor(Color.BLUE);
-        for (int i = 0; i < POLYGON_POINTS; i++) {
-            options.add(markers.get(i).getPosition());
-        }
-
-        shape = mMap.addPolygon(options);
-    }
-
     private void addMarker(Address add, double lat, double lng) {
 
-        if (markers.size() == POLYGON_POINTS) {
+        if (marker != null) {
             removeEverything();
         }
-
+        LatLng latLng = new LatLng(lat, lng);
         MarkerOptions options = new MarkerOptions()
                 .title(add.getLocality())
-                .position(new LatLng(lat, lng))
+                .position(latLng)
                 .draggable(true)
                 .icon(BitmapDescriptorFactory.defaultMarker());
 //              .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_marker));
@@ -265,22 +255,20 @@ public class MainActivity extends AppCompatActivity
             options.snippet(country);
         }
 
-        markers.add(mMap.addMarker(options));
-        if (markers.size() == POLYGON_POINTS) {
-            addPolygon();
-        }
-
+        marker = mMap.addMarker(options);
+        CircleOptions circleOptions = new CircleOptions()
+                .radius(1000)
+                .fillColor(0x330000FF)
+                .strokeColor(Color.BLUE)
+                .center(latLng);
+        shape = mMap.addCircle(circleOptions);
     }
 
     private void removeEverything() {
-        for (Marker marker : markers) {
-            marker.remove();
-        }
-        markers.clear();
-        if (shape != null) {
-            shape.remove();
-            shape = null;
-        }
+        marker.remove();
+        marker = null;
+        shape.remove();
+        shape = null;
     }
 
     private void hideSoftKeyboard(View view) {
