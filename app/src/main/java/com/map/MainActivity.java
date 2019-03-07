@@ -143,17 +143,25 @@ public class MainActivity extends AppCompatActivity
             if (marker != null) {
                 marker.remove();
             }
-            MarkerOptions options = new MarkerOptions()
-                    .title(locality)
-                    .position(new LatLng(lat, lng))
-                  //  .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_BLUE));
-                    .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_marker));
+            addMarker(add, lat, lng);
 
-            marker = mMap.addMarker(options);
 
         }
 
+    }
 
+    private void addMarker(Address add, double lat, double lng) {
+        MarkerOptions options = new MarkerOptions()
+                .title(add.getLocality())
+                .position(new LatLng(lat, lng))
+                .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_marker));
+
+        String country = add.getCountryName();
+        if (country.length() > 0) {
+            options.snippet(country);
+        }
+
+        marker = mMap.addMarker(options);
     }
 
     private void hideSoftKeyboard(View view) {
