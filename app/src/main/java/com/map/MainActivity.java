@@ -170,6 +170,35 @@ public class MainActivity extends AppCompatActivity
                     return false;
                 }
             });
+
+            mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+                @Override
+                public void onMarkerDragStart(Marker marker) {
+
+                }
+
+                @Override
+                public void onMarkerDrag(Marker marker) {
+
+                }
+
+                @Override
+                public void onMarkerDragEnd(Marker marker) {
+                    Geocoder gc = new Geocoder(MainActivity.this);
+                    List<Address> list=null;
+                    LatLng ll = marker.getPosition();
+                    try {
+                        list = gc.getFromLocation(ll.latitude,ll.longitude,1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        return;
+                    }
+                    Address add = list.get(0);
+                    marker.setTitle(add.getLocality());
+                    marker.setSnippet(add.getCountryName());
+                    marker.showInfoWindow();
+                }
+            });
         }
     }
 
@@ -212,6 +241,7 @@ public class MainActivity extends AppCompatActivity
         MarkerOptions options = new MarkerOptions()
                 .title(add.getLocality())
                 .position(new LatLng(lat, lng))
+                .draggable(true)
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_map_marker));
 
         String country = add.getCountryName();
