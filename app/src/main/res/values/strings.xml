@@ -7,4 +7,5 @@
     <string name="error_find_hotel">"Can't find hotel"</string>
     <string name="locality_dummy">Locality</string>
     <string name="snippet_dummy">Snippet</string>
+    <string name="license_label">Legal Notices</string>
 </resources>
